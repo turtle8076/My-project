@@ -2,13 +2,13 @@ if __name__ == '__main__':
     import functions as pgf
 import random as rnd
 import threading
-import numpy as np
+import numpy as np  # 백터, 행렬 연산 라이브러리
 from copy import deepcopy  # 내부에 객체들까지 모두 새롭게 copy
 from genome import Genome
 import pygame
 import time
 import sys
-import csv
+import csv  # output을 csv파일로 저장하기 위해
 
 gamegrid = [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
             9, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9, 9, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
@@ -74,7 +74,7 @@ gamegrid1 = [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9
              9, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
              9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]
 
-sys.setrecursionlimit(10000) #재귀함수 최대깊이 설정
+sys.setrecursionlimit(10000)  # 재귀함수 최대깊이 설정, 재귀함수 최대깊이 설정
 Game = False
 
 N_POPULATION = 16  # population에 포함될 chromosome의 개수
@@ -83,34 +83,32 @@ N_CHILDREN = 4  # crossover에서 생성할 chromosome의 개수
 PROB_MUTATION = 0.2  # mutation이 발생할 확률
 
 # 초기 population 생성 Genome클래스 생성
-#genomes = [Genome() for _ in range(N_POPULATION)]  # Genome()들 생성 50개
-# solution
+# genomes = [Genome() for _ in range(N_POPULATION)]  # Genome()들 생성 50개
+# # solution
 best_genomes = None  # 최고 유전자 미지정
 n_gen = 0  # 세대 초기화
 FPS = 300
 
 
 # 프레임 속도
-
-
 def writeScore(count):
     global score
-    pygame.draw.rect(pgf.screen, (0, 0, 0), [500, 760, 300, 100])
+    pygame.draw.rect(pgf.screen, (0, 0, 0), [500, 760, 300, 100])  # 표면, RGB, x축y축가로세로
     score += count
-    font = pygame.font.Font(r'Images\NanumGothic.ttf', 25)
+    font = pygame.font.Font('NanumGothic.ttf', 25)
     text = font.render('Score : ' + str(score), True, (255, 255, 255))
     pgf.screen.blit(text, (500, 760))
 
 
 def writeGeneration(num):
     pygame.draw.rect(pgf.screen, (0, 0, 0), [30, 760, 300, 100])
-    font = pygame.font.Font(r'Images\NanumGothic.ttf', 25)
-    text = font.render('Generation : ' + str(num), True, (255, 255, 255))
-    pgf.screen.blit(text, (30, 760))
+    font = pygame.font.Font('NanumGothic.ttf', 25)
+    text = font.render('Generation : ' + str(num), True, (255, 255, 255))  # 출력할 텍스트, 안티 엘리어심, 색
+    pgf.screen.blit(text, (30, 760))  # 지정한 좌표가 이미 왼쪾 아래에 위치
 
 
 def i2xy(i):  # 그리드의 인덱스번호를 좌표료 변환
-    sp = i % column
+    sp = i % column  # 행, 열
     ze = i // column  # // 연산자는 나누기 결과값을 int형으로 반환하는 것.
     return (sp * grid) + (grid // 2), (ze * grid) + (grid // 2)  # ex) 50번째 인덱스는 위의 연산을 거쳐 539, 35 라는 좌표가 생성된다
 
@@ -128,7 +126,7 @@ class Point:
 
 
 class Figure:  # 팩맨, 고스트 등의 움직이는 물체 클래스
-    def __init__(self, name, pos):
+    def __init__(self, name, pos):  # __init__는 생성자 초기값
         self.name = name
         self.x, self.y = pos  # pos 에는 두 개의 반환값을 가진 함수가 들어와야하고, 그 두개의 반환값은 좌표로서 x,y에 저장
         self.direction = 0  #
@@ -200,7 +198,7 @@ class Pacman(Figure):
 
     def motinlogic(self):
         if not self.ongrid: return
-        #if self.warp(): return
+        # if self.warp(): return
         self.pointEat()
 
         break_swith = 0
@@ -226,7 +224,7 @@ class Pacman(Figure):
             newdirection = self.ghost_output(genome)  # 랜덤으로 방향을 설정
             self.changedirection(newdirection)
             if not self.directionValid(self.direction, self.i):
-                self.rx  , self.ry = 0, 0
+                self.rx, self.ry = 0, 0
 
     def pointEat(self):
         pt = 0
@@ -280,7 +278,6 @@ class Pacman(Figure):
         return point_num
 
     def ghost_sensor(self):
-
         pacman_pos = xy2i(self.x, self.y)  # 팩맨과 고스트들의 현재 인덱스 저장
         blinky_pos = xy2i(blinky.x, blinky.y)
         pinky_pos = xy2i(pinky.x, pinky.y)
@@ -292,14 +289,14 @@ class Pacman(Figure):
         sensor = [[[], [], [], []],
                   [[], [], [], []],
                   [[], [], [], []],
-                  [[], [], [], []]]  # 각 센서를 담은 리스트
+                  [[], [], [], []]]  # 각 센서를 담은 리스트 ????
 
         search_func(self, sensor, pacman_pos, pacman_pos, 2)
 
         ghost_input = [0, 0, 0, 0]  # 고스트가 4방향중 어디있는지 알려줄 input값
 
         for ghost in ghost_list:
-            for i, s in enumerate(sensor):
+            for i, s in enumerate(sensor):  # 열거
                 if ghost in s:  # 먼저 각 센서의 뿌리에 있는지 확인
                     ghost_input[i] = 1
                 else:  # 아니라면
@@ -307,7 +304,6 @@ class Pacman(Figure):
                         if j > 3: break  # 4번째 가지를 지나면 뿌리가 나오므로 뿌리는 패스
                         if ghost in a:  # 가지안에 있다면
                             ghost_input[i] = 1
-
         # print(ghost_input)
         return ghost_input
 
@@ -322,52 +318,20 @@ class Pacman(Figure):
         outputs = genome.forward(inputs)  # 뉴럴 네트워크 사용
 
         for i in range(4):  # 현재 위치에서 4방향 탐색
-         if not self.directionValid(i, self.i):  # 현재 탐색 방향이 벽이 막혀있다면 ouput 방향으로 고려하지않음
-            outputs[i] = 0  # 그렇기에 현재 탐색 방향에 해당하는 인덱스의 값을 가장 작은 0으로 바꿈
+            if not self.directionValid(i, self.i):  # 현재 탐색 방향이 벽이 막혀있다면 ouput 방향으로 고려하지않음
+                outputs[i] = 0  # 그렇기에 현재 탐색 방향에 해당하는 인덱스의 값을 가장 작은 0으로 바꿈
 
         outputs = np.argmax(outputs)  # argmax 는 softmax의 최대값의 인덱스(위치)를 반환
 
         if inputs[outputs] == 0:  # 피트니스 설정을 위한 얼마나 피했는가 카운트
             self.evasion += 1  # outputs, 즉 최종 출력값이 유령이 있는 방향이 아니라면 피하는데 성공
-            #print("현재 유령 위치: ", inputs, "최종 판단 방향", outputs, "에 유령이 없음! 현재 누적 회피수 : ", self.evasion)
+            # print("현재 유령 위치: ", inputs, "최종 판단 방향", outputs, "에 유령이 없음! 현재 누적 회피수 : ", self.evasion)
 
         elif inputs[outputs] == 1:  # 유령을 향해서 가면 회피 카운트를 깎는다
             self.evasion -= 2
-            #print("현재 유령 위치: ", inputs, "최종 판단 방향", outputs, "에 유령이 있음! 현재 누적 회피수 : ", self.evasion)
-
+            # print("현재 유령 위치: ", inputs, "최종 판단 방향", outputs, "에 유령이 있음! 현재 누적 회피수 : ", self.evasion)
         return outputs
 
-    def front_wall_ghost_output(self, genome):
-        self.genome = genome
-
-        input1 = self.ghost_sensor()
-        input2 = self.point_sensor()
-        inputs = input1
-        # outputs엔 genome에서 return한 정면, 왼쪽, 오른쪽에 대한 값이 있으며 그중 가장 확률이 높은 것을 선택(argmax())
-
-        outputs = genome.forward(inputs)  # 뉴럴 네트워크 사용
-
-        max = 0
-        for i in range(4):  # 현재 위치에서 4방향 탐색
-            if not self.directionValid(i, self.i):  # 현재 탐색 방향이 벽이 막혀있다면 ouput 방향으로 고려하지않음
-                outputs[i] = 0  # 그렇기에 현재 탐색 방향에 해당하는 인덱스의 값을 가장 작은 0으로 바꿈
-            if outputs[i] > max:  # 최대값 구하기
-                max = outputs[i]
-
-        # print(outputs)    # 확률이 담긴 리스트 출력
-
-        max_index_list = []  # 최대값들의 인덱스를 닮을 리스트
-        for j, v in enumerate(outputs):  # 정제된 outputs 리스트를 탐색
-            if v == max:  # 최대 값이라면
-                max_index_list.append(j)  # 리스트에 추가
-
-        outputs = rnd.choice(max_index_list)
-        # outputs = np.argmax(outputs) # 벽 방향은 전부 0으로 바꾼 다음에 가장 확률이 높은 곳을 치환
-        if inputs[outputs] == 0:  # 피트니스 설정을 위한 얼마나 피했는가 카운트
-            self.evasion += 1  # outputs, 즉 최종 출력값이 유령이 있는 방향이 아니라면 피하는데 성공
-        elif inputs[outputs] == 1:  # 유령을 향해서 가면 회피 카운트를 깎는다
-            self.evasion -= 2
-        return outputs
 
 def run(self):
     global clear
@@ -408,9 +372,6 @@ def run(self):
         if pgf.keyPressed('1'):
             break
 
-        # print('input:', pacman.ghost_sensor())
-        # print('output:', pacman.ghost_output(genome))
-
         # pacman.ghost_output(genome)  # Snake 모듈에서 화면 출력과 유전자 값을 그대로 가져옴
         # genome.fitness = fitness  # fitness를 genome에 넣고 실행
 
@@ -427,9 +388,9 @@ def search_func(self, sensor, pacman_pos, pos, n):
         if gamegrid[pos + rx + ry * column] == 9: continue  # 현재 방향대로 한칸 나아갔을 때 벽이라면 패스
         # 다음칸이 벽이 아니라면 본격적으로 뿌리센서의 넣을 값을 탐색
         while True:  # 센서방향이 정해졌으면 그 방향을 뿌리로 두며 루프 시작
-            rx, ry = directions[s_direction]  # 커브길에 따라 바뀔수있으므로 탐색때마다 초기화
+            rx, ry = directions[s_direction]  # 커브길에 따라 바뀔 수 있으므로 탐색때마다 초기화
             search_pos = search_pos + rx + ry * column  # 진행방향의 다음칸으로 탐색위치 증가
-            if search_pos == pacman_pos : break   # 센서 탐색 범위가 팩맨 위치와 겹친다면 그 이상 탐색할 이유가 없으므로 break
+            if search_pos == pacman_pos: break  # 센서 탐색 범위가 팩맨 위치와 겹친다면 그 이상 탐색할 이유가 없으므로 break
             if gamegrid[search_pos] == 9: break  # 현재탐색위치가 벽이라면 while 루프 탈출
             if not crossway_valid(search_pos):  # 현재 탐색위치가 교차로가 아니면
                 v.append(search_pos)  # 탐색 위치를 뿌리센서에 삽입
@@ -437,7 +398,7 @@ def search_func(self, sensor, pacman_pos, pos, n):
                 if not Figure.directionValid(self, s_direction, search_pos):  # 현재방향의 다음 탐색위치가 막혀버렸다면
                     for j in range(0, 4):  # 사방향을 하나씩 탐색
                         if j == s_direction or j + s_direction in (1, 5):
-                            continue  # 현재방향(어차피막힘)과 현재방향의 반대방향, 즉 되돌아가는 방향은 고려하지않음
+                            continue  # 현재방향(어차피막힘)과 현재방향의 반대방향, 즉 되돌아가는 방향은 고려하지않음 ????
                         if Figure.directionValid(self, j, search_pos):  # 탐색할 방향이 막혀있지않으면
                             s_direction = j  # 탐색방향 재설정
                             break  # 어차피 교차로가 아닐때 상항이기 때문에 꺾을 수 있는 방향은 하나뿐이므로 for 루프 탈출
@@ -482,7 +443,6 @@ class ghost(Figure):
 
     def motinlogic(self):
         if not self.ongrid: return
-        #if self.warp(): return
         while True:
             while True:
                 newdirection = rnd.randrange(4)  # 랜덤으로 방향을 설정
@@ -508,20 +468,12 @@ class Blinky(Figure):
         self.keyboardmemory = 0
 
     def motinlogic(self):
-
         if not self.ongrid: return
-        #if self.warp(): return
-        '''
-        self.changedirection(self.keyboardmemory)  # 조종하기~
-        if not self.directionValid(self.direction, self.i):
-            self.rx, self.ry = 0, 0
-        '''
 
         while True:
             while True:
                 tracex = pacman.x - blinky.x
                 tracey = pacman.y - blinky.y
-                #print(tracex, tracey)
                 newdirection = rnd.randrange(4)  # 랜덤으로 방향을 설정
 
                 if self.direction == 0 and newdirection != 1 or \
@@ -555,6 +507,7 @@ class Blinky(Figure):
             if self.changedirection(newdirection):
                 break  # Abort the 1st While Loop
 
+
 class Gacman(Figure):
     def __init__(self, name, pos):
         Figure.__init__(self, name, pos)  # 파라미터로 Figure 클래스를 쓸것임으로 먼저 초기화
@@ -564,22 +517,22 @@ class Gacman(Figure):
         self.keyboardmemory = 0
 
     def pointEat(self):
-            pt = 0
-            if gamegrid[self.i] not in (1, 2): return  # 1,2가 아니면 함수 중단
-            if gamegrid[self.i] == 2:  # 2 값, 즉 큰 포인트를 먹었을때
-                changemodeGhosts('frighten')  # 유령들은 잡아먹힐 수 있는 상태가 됨
-            gamegrid[self.i] = 0  # gamegrid 에서 먹힌 포인트는 자리를 비운다 즉, 0으로
-            pgf.killSprite(point_d[self.i].sprite)  # 자리에있던 포인트 스프라이트 제거.
-            writeScore(10)
-            del point_d[self.i]  # del 함수는 delete 포인트 객체 또한 지워준다.
+        pt = 0
+        if gamegrid[self.i] not in (1, 2): return  # 1,2가 아니면 함수 중단
+        if gamegrid[self.i] == 2:  # 2 값, 즉 큰 포인트를 먹었을때
+            changemodeGhosts('frighten')  # 유령들은 잡아먹힐 수 있는 상태가 됨
+        gamegrid[self.i] = 0  # gamegrid 에서 먹힌 포인트는 자리를 비운다 즉, 0으로
+        pgf.killSprite(point_d[self.i].sprite)  # 자리에있던 포인트 스프라이트 제거.
+        writeScore(10)
+        del point_d[self.i]  # del 함수는 delete 포인트 객체 또한 지워준다.
 
-    def motinlogic(self): #모션(움직임) 로직
-            if not self.ongrid: return #ongrid가 거짓일때 함수 중단
-            #if self.warp(): return #warp함수의 결과값이 참일때 함수 중단
-            self.pointEat() #항상 포인트먹기를 행동
-            self.changedirection(self.keyboardmemory) #키보드입력대로 방향전환
-            if not self.directionValid(self.direction, self.i): #방향 확인 함수 반환값이 false라면
-                self.rx, self.ry = 0, 0 #방향 전환 및 움직일 수 없으므로 정지
+    def motinlogic(self):  # 모션(움직임) 로직
+        if not self.ongrid: return  # ongrid가 거짓일때 함수 중단
+        # if self.warp(): return #warp함수의 결과값이 참일때 함수 중단
+        self.pointEat()  # 항상 포인트먹기를 행동
+        self.changedirection(self.keyboardmemory)  # 키보드입력대로 방향전환
+        if not self.directionValid(self.direction, self.i):  # 방향 확인 함수 반환값이 false라면
+            self.rx, self.ry = 0, 0  # 방향 전환 및 움직일 수 없으므로 정지
 
 
 def pointSet():
@@ -597,7 +550,7 @@ def pointSet():
         for i, number in enumerate(gamegrid1):  # gamegrid 배열을 for문으로 탐색
             if number not in (1, 2): continue  # 숫자가 1,2가 아니면 패스
             point_d[i] = Point(i2xy(i), 'Images\Teil_17_Punkt.png') if number == 1 else Point(i2xy(i),
-                                                                                                 'Images\Teil_17_Punkt_gross.png')
+                                                                                              'Images\Teil_17_Punkt_gross.png')
             # 즉 point_d라는 딕셔너리 의 원소로서 Point 클래스 형 객체가 좌표값과 스프라이트를 파라미터로 가지며 들어간다.
             pgf.showSprite(point_d[i].sprite)
 
@@ -613,17 +566,18 @@ def changemodeGhosts(mode):
         timer1 = threading.Timer(5, changemodeGhosts, ('blink',)).start()
         timer2 = threading.Timer(8, changemodeGhosts, ('hunt',)).start()
 
+
 trikey = 0
 dlt = True
 directions = {0: (1, 0), 1: (-1, 0), 2: (0, -1), 3: (0, 1)}
 width, height = 672, 812
 grid = 24
-column = width // grid  # 넓이 즉 가로를 grid변수로 나눴을때 나오는 28은 gamegrid의 배열 가로 갯수
-zeilen = height // grid  # 높이 즉 세로를 grid변수로 나눴을때 나오는 31은 gamegrid의 배열 새로 갯수
+column = width // grid  # 넓이 즉 가로를 grid변수로 나눴을때 나오는 28은 gamegrid의 배열 가로 갯수 (열)
+zeilen = height // grid  # 높이 즉 세로를 grid변수로 나눴을때 나오는 31은 gamegrid의 배열 새로 갯수 (행)
 
 pgf.screenSize(width, height)
-main1 = pygame.image.load('Images\Main_image1.png') #제목 이미지
-main2 = pygame.image.load('Images\Main_image2.png') #제목 이미지2
+main1 = pygame.image.load('Images\Main_image1.png')  # 제목 이미지
+main2 = pygame.image.load('Images\Main_image2.png')  # 제목 이미지2
 nextAnimation = pgf.clock() + 100
 
 clear = False
@@ -636,26 +590,26 @@ def main():
     pgf.updateDisplay()
 
     while True:
-        #pgf.tick(50)
+        # pgf.tick(50)
         pgf.screen.blit(main1, (183, 200))
         pgf.screen.blit(main2, (180, 310))
         pgf.updateDisplay()
 
-        font = pygame.font.Font(r'Images\NanumGothic.ttf', 35)
+        font = pygame.font.Font('NanumGothic.ttf', 35)
         gamestart = font.render('G a m e   S t a r t', True, (255, 255, 255))
         pgf.screen.blit(gamestart, (180, 500))
         if trikey == 0:
             tri = Point((120, 520), 'Images\Triangle.png')
             pgf.showSprite(tri.sprite)
 
-        font = pygame.font.Font(r'Images\NanumGothic.ttf', 35)
+        font = pygame.font.Font('NanumGothic.ttf', 35)
         simulation = font.render('S i m u l a t i o n', True, (255, 255, 255))
         pgf.screen.blit(simulation, (180, 570))
         if trikey == 1:
             tri = Point((120, 590), 'Images\Triangle.png')
             pgf.showSprite(tri.sprite)
 
-        font = pygame.font.Font(r'Images\NanumGothic.ttf', 35)
+        font = pygame.font.Font('NanumGothic.ttf', 35)
         exit = font.render('E X I T', True, (255, 255, 255))
         pgf.screen.blit(exit, (180, 640))
         if trikey == 2:
@@ -675,21 +629,21 @@ def main():
                 pgf.hideAll()
 
         if pgf.keyPressed('space'):
-            if (trikey == 2): # 종료
+            if (trikey == 2):  # 종료
                 pygame.quit()
                 sys.exit()
                 break
-            else :
+            else:
                 break
 
 
 if __name__ == "__main__":
-    f = open('PlayerOutput.csv', 'w', newline='') #플레이어 아웃풋 파일 열기
+    f = open('PlayerOutput.csv', 'w', newline='')  # 플레이어 아웃풋 파일 열기
     wr = csv.writer(f)
     wr.writerow(["Time", "Score"])
     while True:
         pgf.screenSize(width, height)
-        main() #메인 화면
+        main()  # 메인 화면
         if trikey == 0:
 
             score = 0
@@ -753,14 +707,20 @@ if __name__ == "__main__":
                     pgf.setAutoUpdate(False)
                     nextAnimation = pgf.clock() + 100
                     run(pacman)
-                    EndT = round(time.time() - StartT,2)  # 시간 측정 끝
+                    EndT = round(time.time() - StartT, 2)  # 시간 측정 끝
 
+                    # Tscore =  score / round(EndT)
+                    # score = round(score, 2)
                     genome.fitness = pacman.evasion
                     wr.writerow([n_gen, i, pacman.evasion, EndT, score])  # csv 파일에 현재 유전자 각 컬럼 값 입력
 
                     if pgf.keyPressed('1'):
                         n_gen = 0
                         break
+
+                    # print('Generation #%s, Genome #%s, fitness: %s, scroe:%s' % (n_gen, i, pacman.evasion, score))
+                    # print('Genomes[0]:' ,genomes[0].fitness)
+                    # print('Genomes[-1]: ', genomes[-1].fitness)
 
                 if pgf.keyPressed('1'):
                     break
@@ -784,7 +744,8 @@ if __name__ == "__main__":
                     # genome에서 만든 neural network의 hidden layer 부분을 최적화하기 위해 유전 알고리즘을 사용함
                     # single crossover로 crossover 지점은 rnd으로 함 randint(a,b) a~b까지 랜덤한 수
                     cut = rnd.randint(0,
-                                      new_genome.w1.shape[1])  # shape는 행렬의 행,열 반환 shape[1]은 열. 최고 유전자 수는 항상 input의 갯수를 넘어서는 안됨
+                                      new_genome.w1.shape[
+                                          1])  # shape는 행렬의 행,열 반환 shape[1]은 열. 최고 유전자 수는 항상 input의 갯수를 넘어서는 안됨
                     new_genome.w1[i, :cut] = a_genome.w1[i, :cut]
                     new_genome.w1[i, cut:] = b_genome.w1[i, cut:]
 
@@ -813,23 +774,26 @@ if __name__ == "__main__":
 
                         if rnd.uniform(0, 1) < PROB_MUTATION:
                             new_genome.w1 += new_genome.w1 * np.random.normal(mean, stddev,
-                                                                              size=(4, 10)) / 100 * np.random.randint(-1, 2,
-                                                                                                                      (4, 10))
+                                                                              size=(4, 10)) / 100 * np.random.randint(
+                                -1, 2,
+                                (4, 10))
                         if rnd.uniform(0, 1) < PROB_MUTATION:
                             new_genome.w2 += new_genome.w2 * np.random.normal(mean, stddev,
-                                                                              size=(10, 20)) / 100 * np.random.randint(-1, 2,
-                                                                                                                       (10, 20))
+                                                                              size=(10, 20)) / 100 * np.random.randint(
+                                -1, 2,
+                                (10, 20))
                         if rnd.uniform(0, 1) < PROB_MUTATION:
                             new_genome.w3 += new_genome.w3 * np.random.normal(mean, stddev,
-                                                                              size=(20, 10)) / 100 * np.random.randint(-1, 2,
-                                                                                                                       (20, 10))
+                                                                              size=(20, 10)) / 100 * np.random.randint(
+                                -1, 2,
+                                (20, 10))
                         if rnd.uniform(0, 1) < PROB_MUTATION:
                             new_genome.w4 += new_genome.w4 * np.random.normal(mean, stddev,
-                                                                              size=(10, 4)) / 100 * np.random.randint(-1, 2,
-                                                                                                                      (10, 4))
+                                                                              size=(10, 4)) / 100 * np.random.randint(
+                                -1, 2,
+                                (10, 4))
 
                         genomes.append(new_genome)
-
 
                 if pgf.keyPressed('1'):
                     break
